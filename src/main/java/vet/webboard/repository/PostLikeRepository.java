@@ -6,4 +6,5 @@ import vet.webboard.domain.PostLike;
 
 @Repository
 public interface PostLikeRepository extends JpaRepository<PostLike, Long> {
+    boolean existsByPostIdAndMemberId(Long postId, Long memberId);
 }
