@@ -1,0 +1,31 @@
+package vet.webboard.service;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import vet.webboard.domain.Member;
+import vet.webboard.domain.Post;
+import vet.webboard.dto.request.CommentCreateRequest;
+import vet.webboard.dto.response.CommentResponse;
+import vet.webboard.repository.CommentRepository;
+import vet.webboard.repository.MemberRepository;
+import vet.webboard.repository.PostRepository;
+
+@Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
+public class CommentService {
+    private final CommentRepository commentRepository;
+    private final MemberRepository memberRepository;
+    private final PostRepository postRepository;
+
+    @Transactional
+    public CommentResponse createComment(Long postId, CommentCreateRequest request, Long memberId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 게시글입니다."));
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        return CommentResponse.from(commentRepository.save(request.toEntity(member, post)));
+    }
+}
