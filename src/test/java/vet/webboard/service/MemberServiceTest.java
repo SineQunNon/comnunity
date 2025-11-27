@@ -6,8 +6,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import vet.webboard.domain.Member;
 import vet.webboard.dto.request.LoginRequest;
+import vet.webboard.dto.request.MemberPasswordUpdateRequest;
+import vet.webboard.dto.request.MemberProfileUpdateRequest;
 import vet.webboard.dto.request.SignupRequest;
 import vet.webboard.dto.response.LoginResponse;
 import vet.webboard.dto.response.MemberResponse;
@@ -132,4 +135,81 @@ class MemberServiceTest {
                 .hasMessage("아이디 또는 비밀번호가 일치하지 않습니다.");
         verify(memberRepository).findByUsername("dleck28");
     }
+
+    @Test
+    @DisplayName("회원정보 수정 - 닉네임, 이미지 업데이트")
+    void successUpdateNicknameAndImage() {
+        //given
+        MemberProfileUpdateRequest request = MemberProfileUpdateRequest.builder()
+                .nickname("updateSine")
+                .profileImage("updateUrl")
+                .build();
+        Long memberId = 1L;
+        Member member = Member.builder()
+                .username("dleck28")
+                .password("qwer1234")
+                .nickname("sine")
+                .profileImage("Url")
+                .build();
+        ReflectionTestUtils.setField(member, "id", memberId);
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+
+        //when
+        MemberResponse response = memberService.updateProfile(request, memberId);
+
+        //then
+        assertThat(response.getNickname()).isEqualTo("updateSine");
+        assertThat(response.getProfileImage()).isEqualTo("updateUrl");
+    }
+
+    @Test
+    @DisplayName("회원정보 수정 - 비밀번호 업데이트")
+    void successUpdatePassword() {
+        //given
+        MemberPasswordUpdateRequest request = MemberPasswordUpdateRequest.builder()
+                .password("qwer12345")
+                .passwordConfirmed("qwer12345")
+                .build();
+        Long memberId = 1L;
+        Member member = Member.builder()
+                .username("dleck28")
+                .password("qwer1234")
+                .nickname("sine")
+                .profileImage("Url")
+                .build();
+        ReflectionTestUtils.setField(member, "id", memberId);
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+
+        //when
+        MemberResponse response = memberService.updatePassword(request, memberId);
+
+        //then
+        assertThat(member.getPassword()).isEqualTo("qwer12345");
+    }
+
+    @Test
+    @DisplayName("회원정보 수정 실패 - 비밀번호와 비밀번호 확인이 다른 경우")
+    void failUpdatePasswordWhenMismatchPassword() {
+        //given
+        MemberPasswordUpdateRequest request = MemberPasswordUpdateRequest.builder()
+                .password("qwer12345")
+                .passwordConfirmed("qewr123465")
+                .build();
+        Long memberId = 1L;
+        Member member = Member.builder()
+                .username("dleck28")
+                .password("qwer1234")
+                .nickname("sine")
+                .profileImage("Url")
+                .build();
+        ReflectionTestUtils.setField(member, "id", memberId);
+        given(memberRepository.findById(memberId)).willReturn(Optional.of(member));
+
+        //when&then
+        assertThatThrownBy(() -> memberService.updatePassword(request, memberId))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("비밀번호가 일치하지 않습니다.");
+    }
+
+
 }
