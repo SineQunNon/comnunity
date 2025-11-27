@@ -5,6 +5,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import vet.webboard.domain.Member;
 import vet.webboard.dto.request.LoginRequest;
+import vet.webboard.dto.request.MemberPasswordUpdateRequest;
+import vet.webboard.dto.request.MemberProfileUpdateRequest;
 import vet.webboard.dto.request.SignupRequest;
 import vet.webboard.dto.response.LoginResponse;
 import vet.webboard.dto.response.MemberResponse;
@@ -46,5 +48,27 @@ public class MemberService {
                 .expiresIn(7L)
                 .member(MemberResponse.from(findMember))
                 .build();
+    }
+
+    @Transactional
+    public MemberResponse updateProfile(MemberProfileUpdateRequest request, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        member.updateNickname(request.getNickname());
+        member.updateProfileImage(request.getProfileImage());
+        return MemberResponse.from(member);
+    }
+
+    @Transactional
+    public MemberResponse updatePassword(MemberPasswordUpdateRequest request, Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        if (!request.getPassword().equals(request.getPasswordConfirmed())) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+        member.updatePassword(request.getPassword());
+        return MemberResponse.from(member);
     }
 }
