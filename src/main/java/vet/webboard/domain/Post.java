@@ -5,8 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -48,8 +46,8 @@ public class Post {
 //    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<Comment> comments = new ArrayList<>();
 //
-//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<PostImage> postImages = new ArrayList<>();
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostImage> postImages = new ArrayList<>();
 //
 //    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<PostLike> postLikes = new ArrayList<>();
@@ -67,6 +65,10 @@ public class Post {
     }
 
     //비즈니스 메서드
+    public boolean isAuthor(Long memberId) {
+        return this.member.getId().equals(memberId);
+    }
+
     public void update(String title, String content) {
         this.title = title;
         this.content = content;
@@ -95,5 +97,15 @@ public class Post {
         if (this.commentCount > 0) {
             this.commentCount--;
         }
+    }
+
+    public void addImage(PostImage postImage) {
+        this.postImages.add(postImage);
+        postImage.setPost(this);
+    }
+
+    public void removeImage(PostImage postImage) {
+        this.postImages.remove(postImage);
+        postImage.setPost(null);
     }
 }

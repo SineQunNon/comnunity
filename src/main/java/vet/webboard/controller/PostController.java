@@ -6,6 +6,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import vet.webboard.dto.request.PostCreateRequest;
+import vet.webboard.dto.request.PostUpdateRequest;
+import vet.webboard.dto.response.PostDetailResponse;
 import vet.webboard.dto.response.PostResponse;
 import vet.webboard.service.PostService;
 
@@ -23,5 +25,14 @@ public class PostController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);
+    }
+
+    @PutMapping("/{postId}")
+    public ResponseEntity<PostDetailResponse> updatePost(
+            @PathVariable Long postId,
+            @RequestBody @Valid PostUpdateRequest request,
+            @RequestParam Long memberId) {
+        PostDetailResponse response = postService.updatePost(postId, request, memberId);
+        return ResponseEntity.ok(response);
     }
 }

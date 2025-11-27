@@ -33,4 +33,8 @@ public class PostImage {
         this.imageUrl = imageUrl;
         this.createdAt = LocalDateTime.now();
     }
+
+    public void setPost(Post post) {
+        this.post = post;
+    }
 }
