@@ -31,6 +31,7 @@ public class CommentService {
         return CommentResponse.from(commentRepository.save(request.toEntity(member, post)));
     }
 
+    @Transactional
     public CommentResponse updateComment(CommentUpdateRequest request, Long commentId, Long memberId) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
