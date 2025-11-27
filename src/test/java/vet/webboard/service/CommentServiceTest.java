@@ -13,6 +13,7 @@ import vet.webboard.domain.Comment;
 import vet.webboard.domain.Member;
 import vet.webboard.domain.Post;
 import vet.webboard.dto.request.CommentCreateRequest;
+import vet.webboard.dto.request.CommentUpdateRequest;
 import vet.webboard.dto.response.CommentResponse;
 import vet.webboard.repository.CommentRepository;
 import vet.webboard.repository.MemberRepository;
@@ -22,6 +23,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -76,5 +78,26 @@ class CommentServiceTest {
         assertThat(response.getContent()).isEqualTo("테스트 댓글");
         assertThat(response.getMember().getId()).isEqualTo(1L);
         verify(commentRepository).save(any(Comment.class));
+    }
+
+    @Test
+    @DisplayName("댓글 수정 성공")
+    void updateCommentSuccess() {
+        //given
+        Comment comment = Comment.builder()
+                .member(member)
+                .post(post)
+                .content("댓글 테스트")
+                .build();
+        ReflectionTestUtils.setField(comment, "id", 1L);
+        CommentUpdateRequest request = new CommentUpdateRequest("댓글 수정 테스트");
+        given(commentRepository.findById(anyLong())).willReturn(Optional.of(comment));
+
+        //when
+        CommentResponse response = commentService.updateComment(request, 1L, 1L);
+
+        //then
+        assertThat(response.getContent()).isEqualTo("댓글 수정 테스트");
+        verify(commentRepository).findById(1L);
     }
 }
