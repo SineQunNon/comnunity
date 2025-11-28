@@ -74,4 +74,16 @@ public class PostService {
         }
         return PostDetailResponse.from(post);
     }
+
+    @Transactional
+    public void deletePost(Long postId, Long memberId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+        if (!post.isAuthor(memberId)) {
+            throw new IllegalArgumentException("게시글 작성자만 게시글을 삭제할 수 있습니다.");
+        }
+
+        postRepository.delete(post);
+    }
 }
