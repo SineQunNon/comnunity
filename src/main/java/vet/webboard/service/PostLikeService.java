@@ -48,4 +48,21 @@ public class PostLikeService {
                 .isLiked(true)
                 .build();
     }
+
+    @Transactional
+    public PostLikeResponse unlikePost(Long postId, Long memberId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+        PostLike postLike = postLikeRepository.findByPostIdAndMemberId(postId, memberId)
+                .orElseThrow(() -> new IllegalArgumentException("좋아요를 하지 않았습니다."));
+
+        postLikeRepository.delete(postLike);
+        post.decreaseLikeCount();
+
+        return PostLikeResponse.builder()
+                .postId(postId)
+                .likeCount(post.getLikeCount())
+                .isLiked(false)
+                .build();
+    }
 }
