@@ -25,16 +25,21 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
-    @Mock MemberRepository memberRepository;
-    @Mock PostRepository postRepository;
-    @Mock CommentRepository commentRepository;
+    @Mock
+    MemberRepository memberRepository;
+    @Mock
+    PostRepository postRepository;
+    @Mock
+    CommentRepository commentRepository;
 
-    @InjectMocks CommentService commentService;
+    @InjectMocks
+    CommentService commentService;
 
     private Member member;
     private Post post;
@@ -99,5 +104,27 @@ class CommentServiceTest {
         //then
         assertThat(response.getContent()).isEqualTo("댓글 수정 테스트");
         verify(commentRepository).findById(1L);
+    }
+
+    @Test
+    @DisplayName("댓글 삭제 성공")
+    void deleteCommentSuccess() {
+        //given
+        Comment comment = Comment.builder()
+                .member(member)
+                .post(post)
+                .content("댓글 테스트")
+                .build();
+        ReflectionTestUtils.setField(comment, "id", 1L);
+
+        given(commentRepository.findById(anyLong())).willReturn(Optional.of(comment));
+        willDoNothing().given(commentRepository).delete(comment);
+
+        //when
+        commentService.deleteComment(1L, 1L);
+
+        //then
+        verify(commentRepository).findById(1L);
+        verify(commentRepository).delete(comment);
     }
 }
