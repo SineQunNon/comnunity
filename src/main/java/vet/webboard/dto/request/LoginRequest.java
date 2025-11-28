@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class LoginRequest {
     @NotBlank(message = "아이디는 필수입니다.")
-    private String uesrname;
+    private String username;
 
     @NotBlank(message = "비밀번호는 필수입니다.")
     private String password;
