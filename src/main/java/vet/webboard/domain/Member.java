@@ -37,14 +37,14 @@ public class Member {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Post> posts = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<Comment> comments = new ArrayList<>();
-//
-//    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<PostLike> postLikes = new ArrayList<>();
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostLike> postLikes = new ArrayList<>();
 
     @Builder
     public Member(String username, String password, String nickname, String profileImage) {

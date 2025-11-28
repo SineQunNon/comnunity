@@ -33,7 +33,7 @@ public class MemberService {
     }
 
     public LoginResponse login(LoginRequest requestDto) {
-        Member findMember = memberRepository.findByUsername(requestDto.getUesrname())
+        Member findMember = memberRepository.findByUsername(requestDto.getUsername())
                 .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다."));
 
         if (!requestDto.getPassword().equals(findMember.getPassword())) {
