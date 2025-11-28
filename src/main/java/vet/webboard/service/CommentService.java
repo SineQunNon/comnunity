@@ -44,4 +44,16 @@ public class CommentService {
 
         return CommentResponse.from(comment);
     }
+
+    @Transactional
+    public void deleteComment(Long commentId, Long memberId) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 댓글입니다."));
+
+        if (!comment.isAuthor(memberId)) {
+            throw new IllegalArgumentException("작성자 본인만 삭제할 수 있습니다.");
+        }
+
+        commentRepository.delete(comment);
+    }
 }

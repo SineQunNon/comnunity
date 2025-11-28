@@ -49,4 +49,8 @@ public class Comment {
         this.content = content;
         this.updatedAt = LocalDateTime.now();
     }
+
+    public boolean isAuthor(Long memberId) {
+        return this.member.getId().equals(memberId);
+    }
 }
