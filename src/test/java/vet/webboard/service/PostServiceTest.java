@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import vet.webboard.domain.Comment;
 import vet.webboard.domain.Member;
 import vet.webboard.domain.Post;
 import vet.webboard.domain.PostImage;
@@ -26,6 +27,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -244,5 +246,64 @@ class PostServiceTest {
         assertThat(response.getImages()).hasSize(3);
 
         verify(postRepository).findById(1L);
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 성공")
+    void successDeletePost() {
+        //given
+        Long memberId = 1L;
+        Long postId = 1L;
+        PostCreateRequest request = new PostCreateRequest("테스트 제목", "테스트 내용", null);
+        Post post = request.toEntity(member);
+        ReflectionTestUtils.setField(post, "id", postId);
+
+        given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+        willDoNothing().given(postRepository).delete(post);
+
+        //when
+        postService.deletePost(postId, memberId);
+
+        //then
+        verify(postRepository).findById(1L);
+        verify(postRepository).delete(post);
+    }
+
+    @Test
+    @DisplayName("게시글 삭제 성공 - cascade로 연관 데이터도 삭제")
+    void successDeletePostWithRelatedData() {
+        Long postId = 1L;
+        PostCreateRequest request = new PostCreateRequest("테스트 제목", "테스트 내용", null);
+        Post post = request.toEntity(member);
+        ReflectionTestUtils.setField(post, "id", postId);
+
+        Member otherMember = Member.builder()
+                .username("dleck28")
+                .password("qwer1324")
+                .nickname("sinequanon")
+                .build();
+        ReflectionTestUtils.setField(otherMember, "id", 2L);
+
+        PostImage image = PostImage.builder()
+                .imageUrl("http://example.com/image.jpg")
+                .build();
+        post.addImage(image);
+
+        // 댓글 추가
+        Comment comment = Comment.builder()
+                .member(otherMember)
+                .content("댓글 내용")
+                .build();
+        ReflectionTestUtils.setField(comment, "post", post);
+
+        given(postRepository.findById(1L)).willReturn(Optional.of(post));
+        willDoNothing().given(postRepository).delete(post);
+
+        // when
+        postService.deletePost(1L, 1L);
+
+        // then
+        verify(postRepository).findById(1L);
+        verify(postRepository).delete(post);
     }
 }
