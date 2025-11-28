@@ -22,7 +22,9 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -89,4 +91,27 @@ class PostLikeServiceTest {
         verify(postLikeRepository, times(1)).save(any(PostLike.class));
     }
 
+    @Test
+    @DisplayName("좋아요 삭제 성공")
+    void unlikePostSuccess() {
+        //given
+        Long postId = 1L;
+        PostLike postLike = PostLike.builder()
+                .member(member)
+                .post(post)
+                .build();
+        ReflectionTestUtils.setField(postLike, "id", 1L);
+
+        given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+        given(postLikeRepository.findByPostIdAndMemberId(anyLong(), anyLong())).willReturn(Optional.of(postLike));
+        willDoNothing().given(postLikeRepository).delete(postLike);
+
+        //when
+        postLikeService.unlikePost(postId, 1L);
+
+        //then
+        verify(postRepository).findById(1L);
+        verify(postLikeRepository).findByPostIdAndMemberId(1L, 1L);
+        verify(postLikeRepository).delete(postLike);
+    }
 }
