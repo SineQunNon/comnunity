@@ -2,13 +2,10 @@ package vet.webboard.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Entity
 @Getter
@@ -72,5 +69,8 @@ public class Member {
         this.updatedAt = LocalDateTime.now();
     }
 
-
+    public void addPost(Post post) {
+        this.posts.add(post);
+        post.setMember(this);
+    }
 }

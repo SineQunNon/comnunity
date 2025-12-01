@@ -36,4 +36,10 @@ public class MemberController {
         MemberResponse memberResponse = memberService.updateProfile(request, memberId);
         return ResponseEntity.ok(memberResponse);
     }
+
+    @GetMapping("/{memberId}")
+    public ResponseEntity<MemberResponse> findMember(@PathVariable Long memberId) {
+        MemberResponse response = memberService.findMember(memberId);
+        return ResponseEntity.ok(response);
+    }
 }

@@ -71,4 +71,11 @@ public class MemberService {
         member.updatePassword(request.getPassword());
         return MemberResponse.from(member);
     }
+
+    public MemberResponse findMember(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 회원입니다."));
+
+        return MemberResponse.from(member);
+    }
 }
