@@ -306,4 +306,82 @@ class PostServiceTest {
         verify(postRepository).findById(1L);
         verify(postRepository).delete(post);
     }
+
+    @Test
+    @DisplayName("게시글 목록 조회")
+    void successToFindPosts() {
+        //given
+        Post post1 = Post.builder()
+                .member(member)
+                .title("테스트 제목1")
+                .content("테스트 본문1")
+                .build();
+        Post post2 = Post.builder()
+                .member(member)
+                .title("테스트 제목2")
+                .content("테스트 본문2")
+                .build();
+        ReflectionTestUtils.setField(post1, "id", 1L);
+        ReflectionTestUtils.setField(post2, "id", 2L);
+        member.addPost(post1);
+        member.addPost(post2);
+        given(postRepository.findAll()).willReturn(List.of(post1, post2));
+
+        //when
+        List<PostResponse> posts = postService.findPosts();
+
+        //then
+        assertThat(posts).hasSize(2);
+        assertThat(posts.getFirst().getTitle()).isEqualTo("테스트 제목1");
+        assertThat(posts.getFirst().getContent()).isEqualTo("테스트 본문1");
+        assertThat(posts.getLast().getTitle()).isEqualTo("테스트 제목2");
+        assertThat(posts.getLast().getContent()).isEqualTo("테스트 본문2");
+
+        verify(postRepository).findAll();
+    }
+
+    @Test
+    @DisplayName("게시글 상세 조회 성공")
+    void successToFindPost() {
+        //given
+        Post post = Post.builder()
+                .member(member)
+                .title("테스트 제목1")
+                .content("테스트 본문1")
+                .build();
+        ReflectionTestUtils.setField(post, "id", 1L);
+        PostImage postImage1 = PostImage.builder()
+                .imageUrl("http://example.com/test1")
+                .post(post)
+                .build();
+        PostImage postImage2 = PostImage.builder()
+                .imageUrl("http://example.com/test2")
+                .post(post)
+                .build();
+        ReflectionTestUtils.setField(postImage1, "id", 1L);
+        ReflectionTestUtils.setField(postImage2, "id", 2L);
+        Comment comment = Comment.builder()
+                .post(post)
+                .member(member)
+                .content("테스트 댓글1")
+                .build();
+        ReflectionTestUtils.setField(comment, "id", 1L);
+
+        member.addPost(post);
+        post.addImage(postImage1);
+        post.addImage(postImage2);
+        post.addComment(comment);
+        given(postRepository.findById(anyLong())).willReturn(Optional.of(post));
+
+        //when
+        PostDetailResponse response = postService.findPost(1L);
+
+        //then
+        assertThat(response.getTitle()).isEqualTo("테스트 제목1");
+        assertThat(response.getContent()).isEqualTo("테스트 본문1");
+        assertThat(response.getImages()).hasSize(2);
+        assertThat(response.getComments()).hasSize(1);
+        assertThat(response.getMember().getNickname()).isEqualTo("sinequanon");
+        verify(postRepository, times(1)).findById(1L);
+    }
 }
