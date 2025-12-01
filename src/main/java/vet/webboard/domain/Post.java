@@ -99,6 +99,7 @@ public class Post {
         }
     }
 
+    //==연관관계 편의 메서드==//
     public void addImage(PostImage postImage) {
         this.postImages.add(postImage);
         postImage.setPost(this);
@@ -107,5 +108,19 @@ public class Post {
     public void removeImage(PostImage postImage) {
         this.postImages.remove(postImage);
         postImage.setPost(null);
+    }
+
+    public void addComment(Comment comment) {
+        this.comments.add(comment);
+        comment.setPost(this);
+    }
+
+    public void removeComment(Comment comment) {
+        this.comments.remove(comment);
+        comment.setPost(null);
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
     }
 }

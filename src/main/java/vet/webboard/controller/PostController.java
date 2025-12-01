@@ -11,6 +11,8 @@ import vet.webboard.dto.response.PostDetailResponse;
 import vet.webboard.dto.response.PostResponse;
 import vet.webboard.service.PostService;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/posts")
@@ -42,5 +44,17 @@ public class PostController {
             @RequestParam Long memberId) {
         postService.deletePost(postId, memberId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<List<PostResponse>> findPosts() {
+        List<PostResponse> response = postService.findPosts();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{postId}")
+    public ResponseEntity<PostDetailResponse> findPost(@PathVariable Long postId) {
+        PostDetailResponse response = postService.findPost(postId);
+        return ResponseEntity.ok(response);
     }
 }

@@ -17,8 +17,9 @@ public class PostDetailResponse {
     private Integer viewCount;
     private Integer likeCount;
     private Integer commentCount;
-    private List<PostImageResponse> images;
     private MemberResponse member;
+    private List<PostImageResponse> images;
+    private List<CommentResponse> comments;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -30,8 +31,12 @@ public class PostDetailResponse {
                 .viewCount(post.getViewCount())
                 .likeCount(post.getLikeCount())
                 .commentCount(post.getCommentCount())
+                .member(MemberResponse.from(post.getMember()))
                 .images(post.getPostImages().stream()
                         .map(PostImageResponse::from)
+                        .toList())
+                .comments(post.getComments().stream()
+                        .map(CommentResponse::from)
                         .toList())
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())

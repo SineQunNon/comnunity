@@ -86,4 +86,17 @@ public class PostService {
 
         postRepository.delete(post);
     }
+
+    public List<PostResponse> findPosts() {
+        return postRepository.findAll().stream()
+                .map(PostResponse::from)
+                .toList();
+    }
+
+    public PostDetailResponse findPost(Long postId) {
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new IllegalArgumentException("게시글을 찾을 수 없습니다."));
+
+        return PostDetailResponse.from(post);
+    }
 }

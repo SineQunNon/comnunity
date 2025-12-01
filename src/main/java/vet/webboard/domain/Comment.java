@@ -5,8 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.time.LocalDateTime;
 
@@ -52,5 +50,10 @@ public class Comment {
 
     public boolean isAuthor(Long memberId) {
         return this.member.getId().equals(memberId);
+    }
+
+    //==연관관계 편의 메서드==//
+    public void setPost(Post post) {
+        this.post = post;
     }
 }
