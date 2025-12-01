@@ -211,5 +211,26 @@ class MemberServiceTest {
                 .hasMessage("비밀번호가 일치하지 않습니다.");
     }
 
+    @Test
+    @DisplayName("회원 정보 조회")
+    void successToSearchUser() {
+        //given
+        Member member = Member.builder()
+                .username("test1234")
+                .password("test1234")
+                .profileImage("http://example.com/test1")
+                .nickname("test")
+                .build();
+        ReflectionTestUtils.setField(member, "id", 1L);
+        given(memberRepository.findById(anyLong())).willReturn(Optional.of(member));
 
+        //when
+        MemberResponse findMember = memberService.findMember(1L);
+
+        //then
+        assertThat(findMember.getUsername()).isEqualTo(member.getUsername());
+        assertThat(findMember.getNickname()).isEqualTo(member.getNickname());
+
+        verify(memberRepository, times(1)).findById(1L);
+    }
 }
